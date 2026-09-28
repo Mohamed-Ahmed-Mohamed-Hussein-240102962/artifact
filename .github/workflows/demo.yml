@@ -20,9 +20,9 @@ jobs:
       - name: dep
         run: npm ci
       - name: lint
-        run: npm lint
+        run: npm run lint
       - name: test
-        run: npm test
+        run: npm run test
   build:
     needs: [test]
     runs-on: ubuntu-22.04
@@ -36,7 +36,7 @@ jobs:
      - name: dep
        run: npm ci
      - name: build
-       run: npm build
+       run: npm run build
   deploy:
     runs-on: ubuntu-22.04
     needs: [build]
