@@ -55,5 +55,14 @@ jobs:
           node-version: '20'
      - name: dep
        run: npm ci
+     - name: dwonload artifact
+       uses: actions/download-artifact@v7
+       with:
+         name: dist-artifact
+         path: ./dist
+     - name: show artifact
+       run: |
+         cd ./dist
+         ls
      - name: deploy
        run: echo "Deploying done ..."
