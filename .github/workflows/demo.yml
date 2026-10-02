@@ -24,6 +24,8 @@ jobs:
       - name: test
         run: npm run test
   build:
+    outputs:
+      file_name: ${{ steps.publish.outputs.x }}
     needs: [test]
     runs-on: ubuntu-22.04
     steps:
@@ -43,6 +45,9 @@ jobs:
          name: dist-artifact
          path: |
            dist
+     - name: file_name_output
+       id: publish
+       run: find dist/assets/*.js -type -f execdir ehco 'x={}' >> $GITHUB_OUTPUT  ';'
   deploy:
     runs-on: ubuntu-22.04
     needs: [build]
@@ -64,5 +69,7 @@ jobs:
        run: |
          cd ./dist
          ls
+     - name: access file name
+       run: ${{needs.build.outputs.file_name}}
      - name: deploy
        run: echo "Deploying done ..."
