@@ -13,10 +13,12 @@ jobs:
     steps:
       - name: pull code
         uses: actions/checkout@v7
-      - name: node
-        uses: actions/setup-node@v6.5.0
-        with: 
-          node-version: '20'
+    
+      - name: cache
+        uses: actions/cache@v6
+        with:
+          path: ~/.npm
+          key: xx-${{hashFiles('**/package-lock.json')}}
       - name: dep
         run: npm ci
       - name: lint
@@ -31,10 +33,12 @@ jobs:
     steps:
      - name: pull code
        uses: actions/checkout@v7
-     - name: node
-       uses: actions/setup-node@v6.5.0
-       with: 
-          node-version: '20'
+    
+     - name: cache
+       uses: actions/cache@v6
+       with:
+        path: ~/.npm
+        key: xx-${{hashFiles('**/package-lock.json')}}
      - name: dep
        run: npm ci
      - name: build
@@ -54,10 +58,11 @@ jobs:
     steps:
      - name: pull code
        uses: actions/checkout@v7
-     - name: node
-       uses: actions/setup-node@v6.5.0
-       with: 
-          node-version: '20'
+     - name: cache
+       uses: actions/cache@v6
+       with:
+          path: ~/.npm
+          key: xx-${{hashFiles('**/package-lock.json')}}
      - name: dep
        run: npm ci
      - name: dwonload artifact
