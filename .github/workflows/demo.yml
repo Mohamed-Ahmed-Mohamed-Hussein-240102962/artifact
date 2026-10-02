@@ -70,6 +70,6 @@ jobs:
          cd ./dist
          ls
      - name: access file name
-       run: ${{needs.build.outputs.file_name}}
+       run: echo " ${{needs.build.outputs.file_name}} "
      - name: deploy
        run: echo "Deploying done ..."
