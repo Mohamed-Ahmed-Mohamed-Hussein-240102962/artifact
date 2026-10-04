@@ -26,7 +26,7 @@ jobs:
           key: xx-${{hashFiles('**/package-lock.json')}}
       - name: dep
         run: npm install
-      - run: npm lint
+      - run: npm run lint
       - run: npm test
   build:
     needs: [test]
@@ -56,7 +56,7 @@ jobs:
           path: dist
       - name: output
         id: print_outputout
-        run: find  dist/assets/**.js -type f -execdir echo 'k={}' >> $GITHUB_OUTPUT ';'
+        run: find  dist/assets/**.js -type f -exec echo 'k={}' >> $GITHUB_OUTPUT ';'
   deploy:
     needs: build
     runs-on: ubuntu-22.04
