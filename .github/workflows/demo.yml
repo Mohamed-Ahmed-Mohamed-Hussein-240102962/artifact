@@ -1,81 +1,91 @@
-name: artifact
+name: demo
 on: 
-  push: 
-    branches: [main]
-    
+  push:
+    branches:
+      - main
+      - dev
   pull_request:
-    types: [opened,closed,edited,synchronize]
-    branches: [main]
+    types: [opened,edited,closed,synchronize]
+    branches: main
+
 jobs:
   test:
     runs-on: ubuntu-22.04
-    
     steps:
-      - name: pull code
+      - name: checkout
         uses: actions/checkout@v7
-    
-      - name: cache
-        uses:  actions/cache@v6
+      - name: node
+        uses: actions/setup-node@v7
+        with:
+           node-version: '20'
+           cache: 'npm'
+      - name: cacheing
+        uses: actions/cache@v6
         with:
           path: ~/.npm
           key: xx-${{hashFiles('**/package-lock.json')}}
-    
       - name: dep
-        run: npm ci
-      - name: lint
-        run: npm run lint
-      - name: test
-        run: npm run test
+        run: npm install
+      - run: npm lint
+      - run: npm test
   build:
-    outputs:
-      file_name: ${{ steps.publish.outputs.x }}
     needs: [test]
     runs-on: ubuntu-22.04
+    outputs:
+      x: ${{steps.print_outputout.outputs.k}}
     steps:
-     - name: pull code
-       uses: actions/checkout@v7
-    
-     - name: cache
-       uses: actions/cache@v6
-       with:
-        path: ~/.npm
-        key: xx-${{hashFiles('**/package-lock.json')}}
-     - name: dep
-       run: npm ci
-     - name: build
-       run: npm run build
-     - name: upload artifact 
-       uses: actions/upload-artifact@v7
-       with:
-         name: dist-artifact
-         path: |
-           dist
-     - name: file_name_output
-       id: publish
-       run: find dist/assets/*.js -type f -exec echo 'x={}' >> $GITHUB_OUTPUT  ';'
-  deploy:
-    runs-on: ubuntu-22.04
-    needs: [build]
-    steps:
-     - name: pull code
-       uses: actions/checkout@v7
-     - name: cache
-       uses: actions/cache@v6
-       with:
+      - name: checkout
+        uses: actions/checkout@v7
+      - name: node
+        uses: actions/setup-node@v7
+        with:
+           node-version: '20'
+           cache: 'npm'
+      - name: cacheing
+        uses: actions/cache@v6
+        with:
           path: ~/.npm
           key: xx-${{hashFiles('**/package-lock.json')}}
-     - name: dep
-       run: npm ci
-     - name: dwonload artifact
-       uses: actions/download-artifact@v7
-       with:
-         name: dist-artifact
-         path: ./dist
-     - name: show artifact
-       run: |
-         cd ./dist
-         ls
-     - name: access file name
-       run: echo " ${{needs.build.outputs.file_name}} "
-     - name: deploy
-       run: echo "Deploying done ..."
+      - name: dep
+        run: npm install
+      - run: npm build
+      - name: upload artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: dist_zip
+          path: dist
+      - name: output
+        id: print_outputout
+        run: find  dist/assets/**.js -type f -execdir echo 'k={}' >> $GITHUB_OUTPUT ';'
+  deploy:
+    needs: build
+    runs-on: ubuntu-22.04
+    steps:
+      - name: checkout
+        uses: actions/checkout@v7
+      - name: node
+        uses: actions/setup-node@v7
+        with:
+           node-version: '20'
+           cache: 'npm'
+      - name: cacheing
+        uses: actions/cache@v6
+        with:
+          path: ~/.npm
+          key: xx-${{hashFiles('**/package-lock.json')}}
+      - name: dep
+        run: npm install
+      - name: download output
+        uses: actions/download-artifact@v7
+        with:
+          name: dist_zip
+          path: ./dist
+      - name: check
+        run: |
+          cd ./dist
+          ls
+      - name: take output
+        run: echo "${{needs.build.outputs.x}}"
+      - run: echo "deploy"
+      
+      
